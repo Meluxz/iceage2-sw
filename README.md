@@ -9,7 +9,7 @@ Built on the [xboxrecomp](https://github.com/sp00nznet/xboxrecomp) runtime as
 vendored in [burnout3-sw](https://github.com/antoxa2584x/burnout3-sw); see
 [what this port changed](docs/XBOXRECOMP_CHANGES.md).
 
-**Version 0.2.1** · Switch (Vulkan / NVK) · Linux (OpenGL) · by **Meluxz**
+**Version 0.2.2** · Switch (Vulkan / NVK) · Linux (OpenGL) · by **Meluxz**
 
 | Main menu | First level |
 |---|---|

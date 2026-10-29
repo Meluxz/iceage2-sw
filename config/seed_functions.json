@@ -60,5 +60,29 @@
   "start": "0x00180900",
   "observed": true,
   "note": "Indirect-call target observed at runtime; decodes as a function body."
+ },
+ {
+  "start": "0x000DF9F0",
+  "note": "Mini-game object setup, reached only through a vtable ([ICALL] Failed to resolve VA 0x000DF9F0); after int3 padding: sub esp, 0x84; push ebp. Missing, the mini-game object stayed null and the game called through 0x2 at 0x000DB1F4."
+ },
+ {
+  "start": "0x000AE310",
+  "note": "Reached only through a pointer in data (vtable scan of the XBE, 2026-10-29); after int3 padding: sub esp, 0x84."
+ },
+ {
+  "start": "0x000AE670",
+  "note": "Reached only through a pointer in data (vtable scan of the XBE, 2026-10-29); after ret: SEH prologue (mov eax, fs:[0]); [ICALL] Failed to resolve during the Sid sled mini-game (Sid floating, not moving)."
+ },
+ {
+  "start": "0x000E8090",
+  "note": "Reached only through a pointer in data (vtable scan of the XBE, 2026-10-29); after int3 padding: push ecx; push ebx; push ebp."
+ },
+ {
+  "start": "0x00243730",
+  "note": "Reached only through a pointer in data (vtable scan of the XBE, 2026-10-29); D3D, after pop esi; ret: mov ecx, [esp+4]."
+ },
+ {
+  "start": "0x0025DB0C",
+  "note": "Reached only through a pointer in data (vtable scan of the XBE, 2026-10-29); after ret 8: mov ecx, [esp+4]."
  }
 ]

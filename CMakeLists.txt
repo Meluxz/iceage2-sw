@@ -160,7 +160,7 @@ endif()
 # tools/wsl_build_switch.sh. The NRO reads the extracted disc from sdmc:/switch/iceage2/game/;
 # the log and iceage2_env.txt live in sdmc:/switch/iceage2/.
 if(NINTENDO_SWITCH)
-    set(ICEAGE2_SWITCH_VERSION "0.2.1")
+    set(ICEAGE2_SWITCH_VERSION "0.2.2")
     # No GL: SDL is only the audio output (and joysticks); NVK comes with nv2a_vk.
     target_link_libraries(${PROJECT_NAME} PRIVATE nx m)
     # SDL's audio thread gets a real-time priority and audren gaps are counted (switch_nx.c).
