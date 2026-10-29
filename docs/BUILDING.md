@@ -117,6 +117,19 @@ Optional: put a 256x256 JPEG at `assets/icon.jpg` for the hbmenu icon.
 JOBS=2 tools/build_switch.sh     # out/switch/iceage2/iceage2.nro
 ```
 
+### 5e. (Optional) NSP forwarder
+
+A forwarder puts Ice Age 2 on the HOME menu and starts the NRO as an
+application (full memory, no title takeover). It is signed with your own
+console's keys (`prod.keys`, dumped with Lockpick_RCM); the keys are only read.
+
+```bash
+KEYS=/path/to/prod.keys tools/forwarder/build_forwarder.sh   # out/forwarder/*.nsp
+```
+
+Install the `.nsp` with DBI. It only points at
+`sdmc:/switch/iceage2/iceage2.nro`, so the NRO and `game/` stay where they are.
+
 ## 6. Install on the Switch
 
 Copy to the SD card:
