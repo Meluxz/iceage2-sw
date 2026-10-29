@@ -45,15 +45,49 @@ The log is written to `sdmc:/switch/iceage2/iceage2_log.txt`; options go in
 
 ## 🛠️ Building
 
-Step by step, from your disc to the NRO: **[docs/BUILDING.md](docs/BUILDING.md)**.
-In short, on Linux or WSL2:
+Linux or WSL2. Full walkthrough, from your disc to the NRO:
+**[docs/BUILDING.md](docs/BUILDING.md)**.
+
+<details open>
+<summary><b>0. Extract your disc</b></summary>
 
 ```bash
-python3 tools/xiso.py IceAge2.iso extract game     # your own disc
-PYTHON=build/venv/bin/python tools/regen.sh        # default.xbe -> C (src/recomp/gen)
-tools/build_linux.sh && tools/play.sh              # PC test build
-NVK_SDK=... tools/build_switch.sh                  # out/switch/iceage2/iceage2.nro
+# Writes game/ (default.xbe, IceAge2/, ...) -- git ignores it
+python3 tools/xiso.py /path/to/IceAge2.iso extract game
 ```
+
+</details>
+
+<details open>
+<summary><b>1. Lift the XBE to C</b></summary>
+
+```bash
+# Needs Python 3 with capstone (pip install capstone). Writes src/recomp/gen (~70 MB, ~25 min)
+XBE=/path/to/game/default.xbe PYTHON=python3 tools/regen.sh
+```
+
+</details>
+
+<details open>
+<summary><b>2a. Linux</b> (SDL2 + OpenGL)</summary>
+
+```bash
+tools/build_linux.sh                                   # build/linux/iceage2_recomp
+ICEAGE2_GAME_DIR=/path/to/game tools/play.sh
+```
+
+</details>
+
+<details open>
+<summary><b>2b. Nintendo Switch</b> (devkitA64, libnx, NVK from mesa-switch, glslang)</summary>
+
+```bash
+tools/build_switch_deps.sh                             # SDL2 + glslang for the Switch, into build/deps
+# Vulkan build (needs mesa-switch NVK); optional hbmenu icon: assets/icon.jpg (256x256)
+NVK_SDK=/path/to/nvk JOBS=2 tools/build_switch.sh      # out/switch/iceage2/iceage2.nro
+```
+
+</details>
 
 ## 📁 Layout
 
