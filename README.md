@@ -1,52 +1,65 @@
-<div align="center">
+# Ice Age 2: The Meltdown — native Switch & Linux port
 
-## Ice Age 2: The Meltdown — Switch / Linux
+**Ice Age 2: The Meltdown** (original Xbox, NTSC-U), statically recompiled:
+the game's x86 code is translated to C and compiled for the Switch's ARM CPU.
+No emulator — the GPU, sound chip and kernel the game expects are provided by
+a small runtime instead.
 
-### Xbox static recompilation for Nintendo Switch and Linux
+Built on the [xboxrecomp](https://github.com/sp00nznet/xboxrecomp) runtime as
+vendored in [burnout3-sw](https://github.com/antoxa2584x/burnout3-sw); see
+[what this port changed](docs/XBOXRECOMP_CHANGES.md).
 
-The original Xbox (NTSC-U) release of **Ice Age 2: The Meltdown**, lifted
-instruction by instruction to C and running natively, with no emulator.
+**Version 0.2.1** · Switch (Vulkan / NVK) · Linux (OpenGL) · by **Meluxz**
 
-![Switch](https://img.shields.io/badge/Nintendo%20Switch-homebrew-E60012?logo=nintendoswitch&logoColor=white)
-![Linux](https://img.shields.io/badge/Linux-x86__64-FCC624?logo=linux&logoColor=black)
-![Vulkan](https://img.shields.io/badge/Vulkan-NVK-AC162C?logo=vulkan&logoColor=white)
-![OpenGL](https://img.shields.io/badge/OpenGL-renderer-5586A4?logo=opengl&logoColor=white)
-![Version](https://img.shields.io/badge/version-0.2.1-blue)
-
-</div>
-
----
+| Main menu | First level |
+|---|---|
+| ![Main menu](docs/screenshots/menu.png) | ![First level](docs/screenshots/level.png) |
 
 > [!IMPORTANT]
-> **No game data is included**, and none of the code generated from it.
-> You need your own copy of the Xbox disc; the C code is generated from your
-> own `default.xbe`. **[How to build it from your disc → docs/BUILDING.md](docs/BUILDING.md)**
+> Nothing from the game is in this repository: no data, no generated code.
+> You need your own Xbox disc, and the C code is generated from your own
+> `default.xbe` — **[step-by-step guide](docs/BUILDING.md)**.
 
-## ✨ Features
+## What works
 
-- 🦫 **Native code**: the whole game runs as recompiled C (~11,500 functions),
-  built with [xboxrecomp](https://github.com/sp00nznet/xboxrecomp)
-- 🎮 **Two renderers**: Vulkan (NVK on Switch) and OpenGL (Linux), translating
-  the NV2A pushbuffer, vertex programs and register combiners at run time
-- 🔊 **Audio** through an emulated Xbox APU, out through SDL2
-- 🎬 **Movies** (XMV) play
-- 🕹️ Joy-Cons / Pro Controller (libnx); keyboard or gamepad on Linux
-- ⏱️ **30 fps**, as on the Xbox
+- The whole game runs from recompiled code: menus, movies, levels, saves
+- 30 fps on Switch, as on the Xbox
+- Audio (emulated MCPX APU), Joy-Cons / Pro Controller, keyboard or pad on Linux
 
-## 🕹️ Playing on Switch
+## What this port adds
 
-1. Copy `iceage2.nro` to `sdmc:/switch/iceage2/`.
-2. Copy the **extracted** disc (not the ISO) to `sdmc:/switch/iceage2/game/`.
-3. Start it with **title takeover**: hold **R** while launching any game.
-   Applet mode leaves too little memory.
+The runtime came from other Xbox ports; getting Ice Age 2 right meant finding
+and fixing bugs in it, most of them in how single x86 instructions were
+translated:
 
-The log is written to `sdmc:/switch/iceage2/iceage2_log.txt`; options go in
+- **Scrat froze** on ice and ledges → x87 `lahf` was never translated, so 59
+  float equality tests read garbage
+- **Underwater streaks** → 8-bit `imul` was translated as 32-bit and wiped the
+  row index of the ripple grid
+- **Black acorns** in the menu → W-buffered depth was ignored
+- **Blue snow, black horizon** → packed 565 clears, texture border colour
+- **Crackling audio** → the music streamer now gets the CPU lock first
+- **20 → 30 fps on Switch** → profiled on the console: CPU culling and lock
+  handovers removed from the hot path
+
+Details: [docs/XBOXRECOMP_CHANGES.md](docs/XBOXRECOMP_CHANGES.md) ·
+history: [CHANGELOG.md](CHANGELOG.md)
+
+## Installing on Switch
+
+From a [release](https://github.com/Meluxz/iceage2-sw/releases) or your own build:
+
+1. `iceage2.nro` → `sdmc:/switch/iceage2/`
+2. Your extracted disc (`default.xbe`, `IceAge2/`, ...) → `sdmc:/switch/iceage2/game/`
+3. Launch with **title takeover** (hold **R** on any game) — applet mode has
+   too little memory
+
+Log: `sdmc:/switch/iceage2/iceage2_log.txt` · options:
 `sdmc:/switch/iceage2/iceage2_env.txt` (`KEY=VALUE` per line).
 
-## 🛠️ Building
+## Building
 
-Linux or WSL2. Full walkthrough, from your disc to the NRO:
-**[docs/BUILDING.md](docs/BUILDING.md)**.
+Linux or WSL2. The full walkthrough is in **[docs/BUILDING.md](docs/BUILDING.md)**.
 
 <details open>
 <summary><b>0. Extract your disc</b></summary>
@@ -89,35 +102,26 @@ NVK_SDK=/path/to/nvk JOBS=2 tools/build_switch.sh      # out/switch/iceage2/icea
 
 </details>
 
-## 📁 Layout
+## Repository
 
-| Path | What |
-|---|---|
-| `src/` | Boot, Switch layer, hand-written fixes (`recomp_manual.c`) |
-| `xboxrecomp/` | The recompilation toolkit and runtime (kernel, NV2A, APU, input) |
-| `config/` | Extra function entry points for the translator |
-| `tools/` | Disc extraction, code generation and build scripts |
-| `docs/` | Build guide |
+```
+src/          boot, Switch layer, hand-written fixes for this game
+xboxrecomp/   recompiler + runtime (kernel, NV2A GPU, MCPX audio, input)
+config/       extra function entry points for the recompiler
+tools/        disc extraction, code generation, build scripts
+docs/         build guide, changes to xboxrecomp, screenshots
+```
 
-## 📊 Status
+## Credits
 
-- Menus, movies and the first levels are playable
-- 30 fps in menus and levels on Switch
-- Saves load and save (`game/UDATA`)
+[xboxrecomp](https://github.com/sp00nznet/xboxrecomp) (MIT) ·
+[burnout3-sw](https://github.com/antoxa2584x/burnout3-sw) (MIT) ·
+[xemu](https://xemu.app) (NV2A/APU reference, LGPL-2.1 audio parts) ·
+[mesa-switch](https://github.com/danfromtico/mesa-switch) (NVK) ·
+glslang · SDL2 · devkitPro / libnx
 
-See [CHANGELOG.md](CHANGELOG.md).
+## License
 
-## 🙏 Credits
-
-- [xboxrecomp](https://github.com/sp00nznet/xboxrecomp): the static recompiler (MIT)
-- [burnout3-sw](https://github.com/antoxa2584x/burnout3-sw): the Switch runtime this builds on (MIT)
-- [xemu](https://xemu.app): NV2A / APU reference and parts of the audio code (LGPL-2.1)
-- [mesa-switch](https://github.com/danfromtico/mesa-switch) (NVK), glslang, SDL2, devkitPro / libnx
-
-Port by **Meluxz**.
-
-## 📜 License
-
-MIT ([LICENSE](LICENSE)). `xboxrecomp/` keeps its own licence and notices
-(MIT, with LGPL-2.1 parts from xemu: see `xboxrecomp/NOTICE`).
-Ice Age 2 is © its respective owners; this project contains none of its data.
+MIT — see [LICENSE](LICENSE). `xboxrecomp/` keeps its own licence and
+notices (`xboxrecomp/LICENSE`, `xboxrecomp/NOTICE`). Ice Age 2 is © its
+respective owners.
