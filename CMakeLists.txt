@@ -176,7 +176,7 @@ if(NINTENDO_SWITCH)
         NAME "Ice Age 2 (Xbox recomp)"
         AUTHOR "Meluxz"
         VERSION "${ICEAGE2_SWITCH_VERSION}")
-    # hbmenu icon: 256x256 JPEG.
+    # hbmenu icon: 256x256 JPEG, optional (not in the repository: bring your own).
     set(ICEAGE2_ICON "${CMAKE_CURRENT_SOURCE_DIR}/assets/icon.jpg")
     if(EXISTS "${ICEAGE2_ICON}")
         nx_create_nro(${PROJECT_NAME} NACP "${ICEAGE2_NACP}" ICON "${ICEAGE2_ICON}")

@@ -84,10 +84,10 @@ extern ptrdiff_t g_xbox_mem_offset;
  * TODO: Set these from your xbe_parser output.
  * Run: py -3 -m tools.xbe_parser game/default.xbe
  */
-/* Absolute, so the exe runs from build\Release without copying 1.5 GB of disc next to it. */
+/* Relative to the working directory: run the exe from the folder that holds game\. */
 #define YOUR_GAME_ENTRY_POINT   0x0010603C  /* XBE entry point VA */
-#define YOUR_GAME_XBE_PATH      "D:\\nx\\IceAge2_Switch\\game\\default.xbe"
-#define YOUR_GAME_DIR            "D:\\nx\\IceAge2_Switch\\game"
+#define YOUR_GAME_XBE_PATH      "game\\default.xbe"
+#define YOUR_GAME_DIR            "game"
 
 /* ── Forward declarations ──────────────────────────────────── */
 

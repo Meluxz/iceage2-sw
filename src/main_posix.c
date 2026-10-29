@@ -8,7 +8,7 @@
  *   xbox_kernel_bridge_init -> g_esp = XBOX_STACK_TOP -> recomp_dispatch_init -> xbe_entry_point()
  * Windows keeps main.c, which Smart App Control will not let run on this PC.
  *
- * Game data: $ICEAGE2_GAME_DIR, else /mnt/d/nx/IceAge2_Switch/game (the extracted disc);
+ * Game data: $ICEAGE2_GAME_DIR, else ./game (the extracted disc; tools/play.sh sets it);
  * on the Switch sdmc:/switch/iceage2/game. The Switch build (devkitA64 + libnx, the Vulkan
  * renderer on NVK) uses switch_nx.c from burnout3-sw for the log, env file and exceptions.
  */
@@ -40,7 +40,7 @@ void switch_error_dialog(const char *msg, const char *details);
 #  define ICEAGE2_DEFAULT_GAME  "sdmc:/switch/iceage2/game"
 #  define ICEAGE2_DEFAULT_SAVE  "sdmc:/switch/iceage2/save"
 #else
-#  define ICEAGE2_DEFAULT_GAME  "/mnt/d/nx/IceAge2_Switch/game"
+#  define ICEAGE2_DEFAULT_GAME  "game"
 #  define ICEAGE2_DEFAULT_SAVE  NULL
 #endif
 /* The MCPX APU's register window, routed to the emulated APU (RECOMP_AC97_READY=plain). */

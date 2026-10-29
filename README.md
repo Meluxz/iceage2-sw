@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/icon.jpg" alt="Ice Age 2: The Meltdown" width="200">
+## Ice Age 2: The Meltdown — Switch / Linux
 
 ### Xbox static recompilation for Nintendo Switch and Linux
 
@@ -19,18 +19,18 @@ instruction by instruction to C and running natively, with no emulator.
 
 > [!IMPORTANT]
 > **No game data is included**, and none of the code generated from it.
-> You need your own copy of the Xbox disc, extracted (`default.xbe`,
-> `IceAge2/`, ...), and you generate the C code from your own `default.xbe`.
+> You need your own copy of the Xbox disc; the C code is generated from your
+> own `default.xbe`. **[How to build it from your disc → docs/BUILDING.md](docs/BUILDING.md)**
 
 ## ✨ Features
 
-- 🦫 **Native code**: the whole game runs as recompiled C (~11,000 functions),
+- 🦫 **Native code**: the whole game runs as recompiled C (~11,500 functions),
   built with [xboxrecomp](https://github.com/sp00nznet/xboxrecomp)
 - 🎮 **Two renderers**: Vulkan (NVK on Switch) and OpenGL (Linux), translating
   the NV2A pushbuffer, vertex programs and register combiners at run time
 - 🔊 **Audio** through an emulated Xbox APU, out through SDL2
 - 🎬 **Movies** (XMV) play
-- 🕹️ Joy-Cons / Pro Controller (libnx), keyboard on Linux
+- 🕹️ Joy-Cons / Pro Controller (libnx); keyboard or gamepad on Linux
 - ⏱️ **30 fps**, as on the Xbox
 
 ## 🕹️ Playing on Switch
@@ -40,19 +40,20 @@ instruction by instruction to C and running natively, with no emulator.
 3. Start it with **title takeover**: hold **R** while launching any game.
    Applet mode leaves too little memory.
 
-The log is written to `sdmc:/switch/iceage2/iceage2_log.txt`; settings go in
+The log is written to `sdmc:/switch/iceage2/iceage2_log.txt`; options go in
 `sdmc:/switch/iceage2/iceage2_env.txt` (`KEY=VALUE` per line).
 
 ## 🛠️ Building
 
-Everything builds on Linux (or WSL). Paths in `tools/` assume the developer's
-layout and will need adjusting.
+Step by step, from your disc to the NRO: **[docs/BUILDING.md](docs/BUILDING.md)**.
+In short, on Linux or WSL2:
 
-1. **Generate the C code** from your `default.xbe` (Python 3 with capstone):
-   `tools/regen.sh` → `src/recomp/gen/` (git-ignored).
-2. **Linux build** (GCC, SDL2, OpenGL/epoxy): `tools/wsl_build_pc.sh`
-3. **Switch build** (devkitA64 + libnx, switch-sdl2, glslang, mesa-switch NVK):
-   `tools/wsl_build_switch_deps.sh`, then `tools/wsl_build_switch.sh`
+```bash
+python3 tools/xiso.py IceAge2.iso extract game     # your own disc
+PYTHON=build/venv/bin/python tools/regen.sh        # default.xbe -> C (src/recomp/gen)
+tools/build_linux.sh && tools/play.sh              # PC test build
+NVK_SDK=... tools/build_switch.sh                  # out/switch/iceage2/iceage2.nro
+```
 
 ## 📁 Layout
 
@@ -61,13 +62,13 @@ layout and will need adjusting.
 | `src/` | Boot, Switch layer, hand-written fixes (`recomp_manual.c`) |
 | `xboxrecomp/` | The recompilation toolkit and runtime (kernel, NV2A, APU, input) |
 | `config/` | Extra function entry points for the translator |
-| `tools/` | Generation, build, debug and profiling scripts |
-| `assets/` | Icon |
+| `tools/` | Disc extraction, code generation and build scripts |
+| `docs/` | Build guide |
 
 ## 📊 Status
 
 - Menus, movies and the first levels are playable
-- 30 fps in menus; levels at 30 fps with dips in heavy scenes on Switch
+- 30 fps in menus and levels on Switch
 - Saves load and save (`game/UDATA`)
 
 See [CHANGELOG.md](CHANGELOG.md).
@@ -77,7 +78,7 @@ See [CHANGELOG.md](CHANGELOG.md).
 - [xboxrecomp](https://github.com/sp00nznet/xboxrecomp): the static recompiler (MIT)
 - [burnout3-sw](https://github.com/antoxa2584x/burnout3-sw): the Switch runtime this builds on (MIT)
 - [xemu](https://xemu.app): NV2A / APU reference and parts of the audio code (LGPL-2.1)
-- Mesa / NVK, glslang, SDL2, devkitPro / libnx
+- [mesa-switch](https://github.com/danfromtico/mesa-switch) (NVK), glslang, SDL2, devkitPro / libnx
 
 Port by **Meluxz**.
 

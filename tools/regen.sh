@@ -1,35 +1,34 @@
 #!/bin/bash
-# Ice Age 2: XBE -> C with xboxrecomp (Git Bash on Windows, Python from ../venv).
-# Toolkit: xboxrecomp-b3, the copy vendored in burnout3-sw (MIT): its translator lifts the hardware
-# register accesses of the linked XDK libraries (--mmio-sections) so the runtime routes them to
-# device models (APU, USB, NV2A) without trapping faults -- upstream v0.16.0 cannot do that on
-# x86-64 Linux, and the title faulted on the APU in DirectSoundCreate (logs/run05, run06).
-# Outputs: $A/{xbe,disasm,func_id,abi}, generated C in iceage2-pc/src/recomp/gen.
-# Library sections (D3D, DSOUND, XMV, ...) are disassembled too: XMV is linked statically and only
-# reachable from game code through those sections. DOLBY is left out: it is marked executable but
-# holds code for the APU's DSP, not x86.
-#   tools/regen.sh                 -> full pipeline
-#   SEEDS=path.json tools/regen.sh -> another --seed-functions file (default: config/seed_functions.json)
-#   TK=xboxrecomp A=analysis tools/regen.sh -> the upstream toolkit and its old outputs
+# Ice Age 2: default.xbe -> C with the vendored xboxrecomp (~20-30 min).
+#   tools/regen.sh                      -> reads game/default.xbe
+#   XBE=/path/to/default.xbe tools/regen.sh
+#   PYTHON=/path/to/python tools/regen.sh   (needs capstone: pip install capstone)
+# Outputs: build/analysis/{xbe,disasm,func_id,abi} and the generated C in src/recomp/gen.
+# The translator lifts the hardware register accesses of the linked XDK libraries
+# (--mmio-sections) so the runtime routes them to its device models (APU, USB, NV2A).
+# Library sections (D3D, DSOUND, XMV, ...) are disassembled too: XMV is linked statically and
+# only reachable through them. DOLBY is left out: it holds code for the APU's DSP, not x86.
 set -euo pipefail
-R=/d/nx/IceAge2_Switch
-TK="$R/${TK:-xboxrecomp-b3}"
+R="$(cd "$(dirname "$0")/.." && pwd)"
+TK="$R/xboxrecomp"
+PY="${PYTHON:-python3}"
+XBE="${XBE:-$R/game/default.xbe}"
 SEEDS="${SEEDS:-$R/config/seed_functions.json}"   # entry points reached only through pointers
-LIB_SECTIONS="D3DX,XMV,D3D,XGRPH,DSOUND,XPP"
-MMIO_SECTIONS="DSOUND,XPP,D3D,XGRPH"               # as burnout3-sw's tools/regen.sh
-PY="$R/venv/Scripts/python.exe"
-export PYTHONUNBUFFERED=1   # a pipe to the log is block-buffered otherwise: the log lags minutes behind
-XBE="$R/game/default.xbe"
-A="$R/${A:-analysis-b3}"
-GEN="$R/iceage2-pc/src/recomp/gen"
-MANUAL="$R/iceage2-pc/src/recomp_manual.c"
+A="${A:-$R/build/analysis}"
+GEN="${GEN:-$R/src/recomp/gen}"
+MANUAL="$R/src/recomp_manual.c"
 SPLIT="${SPLIT:-250}"
+LIB_SECTIONS="D3DX,XMV,D3D,XGRPH,DSOUND,XPP"
+MMIO_SECTIONS="DSOUND,XPP,D3D,XGRPH"
+export PYTHONUNBUFFERED=1
+
+[ -f "$XBE" ] || { echo "no $XBE: extract your disc to game/ first (docs/BUILDING.md)"; exit 1; }
+"$PY" -c "import capstone" 2>/dev/null || { echo "$PY has no capstone: pip install capstone"; exit 1; }
 mkdir -p "$A/xbe" "$A/disasm" "$A/func_id" "$A/abi" "$GEN"
 cd "$TK"
 
 step() { echo; echo "===== $1  $(date +%T)"; }
 t0=$SECONDS
-echo "toolkit: $TK"
 
 step xbe_parser
 "$PY" -m tools.xbe_parser "$XBE" --json "$A/xbe/default_analysis.json" --quiet
@@ -47,11 +46,9 @@ step abi_analysis
 
 step recomp
 rm -f "$GEN"/*.c "$GEN"/*.h   # recomp_types.h too: it is written only when absent
-mmio=()
-[ "$TK" != "$R/xboxrecomp" ] && mmio=(--mmio-sections "$MMIO_SECTIONS")
 "$PY" -m tools.recomp "$XBE" --game-name "Ice Age 2" --all --split "$SPLIT" --gen-dir "$GEN" \
   --disasm-dir "$A/disasm" --func-id-dir "$A/func_id" --abi-dir "$A/abi" \
-  --exclude-manual "$MANUAL" "${mmio[@]}"
+  --exclude-manual "$MANUAL" --mmio-sections "$MMIO_SECTIONS"
 
 step done
 echo "total $(( (SECONDS - t0) / 60 )) min"

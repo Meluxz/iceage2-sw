@@ -56,3 +56,8 @@ Thumbs.db
 prof.bin
 iceage2_log*.txt
 logs/
+
+# Extracted disc and outputs
+game/
+out/
+assets/icon.jpg
