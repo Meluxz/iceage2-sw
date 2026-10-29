@@ -1,0 +1,64 @@
+[
+ {
+  "start": "0x00259A80",
+  "note": "XPP section; reached only through a pointer ([ICALL] Failed to resolve, logs/run02..run06). push ebp; mov ebp, esp; sub esp, 0xC: a real prologue."
+ },
+ {
+  "start": "0x0025A487",
+  "note": "XPP; right after 'ret 0xC' with no padding (logs/run07_b3)."
+ },
+ {
+  "start": "0x0023AEA0",
+  "note": "D3D; right after 'ret 4' with no padding (logs/run07_b3)."
+ },
+ {
+  "start": "0x0023BDB0",
+  "note": "D3D; right after 'ret 4' with no padding (logs/run07_b3)."
+ },
+ {
+  "start": "0x0025E12B",
+  "note": "XPP; right after 'ret 8' with no padding (logs/run08_ac97)."
+ },
+ {
+  "start": "0x00105FC8",
+  "observed": true,
+  "note": "PsCreateSystemThreadEx StartContext1 observed at runtime; decodes as a function body."
+ },
+ {
+  "start": "0x0011D3F0",
+  "observed": true,
+  "note": "Indirect-call target observed at runtime; decodes as a function body."
+ },
+ {
+  "start": "0x001D4FE0",
+  "observed": true,
+  "note": "PsCreateSystemThreadEx StartContext1 observed at runtime; decodes as a function body."
+ },
+ {
+  "start": "0x001D5FB0",
+  "observed": true,
+  "note": "PsCreateSystemThreadEx StartContext1 observed at runtime; decodes as a function body."
+ },
+ {
+  "start": "0x0025D6C6",
+  "observed": true,
+  "note": "Indirect-call target observed at runtime; decodes as a function body."
+ },
+ {
+  "start": "0x00012910",
+  "note": "Unresolved stub (recomp_stubs_unresolved.c) in a gap no detected function covers: an undiscovered function."
+ },
+ {
+  "start": "0x0002FA00",
+  "note": "Unresolved stub (recomp_stubs_unresolved.c) in a gap no detected function covers: an undiscovered function."
+ },
+ {
+  "start": "0x00185EB0",
+  "note": "Unresolved stub (recomp_stubs_unresolved.c) in a gap no detected function covers: an undiscovered function."
+ },
+ {
+  "start": "0x00180900",
+  "observed": true,
+  "note": "Indirect-call target observed at runtime; decodes as a function body."
+ }
+]
