@@ -5,8 +5,8 @@
   <a href="docs/BUILDING.md"><img alt="Linux x86_64" src="https://img.shields.io/badge/Linux-x86__64-fcc624?logo=linux&logoColor=black"></a>
   <a href="https://github.com/danfromtico/mesa-switch"><img alt="Vulkan 1.3" src="https://img.shields.io/badge/Vulkan-1.3-ac162c?logo=vulkan&logoColor=white"></a>
   <a href="docs/BUILDING.md"><img alt="OpenGL renderer" src="https://img.shields.io/badge/OpenGL-renderer-5586a4?logo=opengl&logoColor=white"></a>
-  <a href="https://github.com/Meluxz/iceage2-sw/releases/latest"><img alt="version" src="https://img.shields.io/github/v/release/Meluxz/iceage2-sw?label=version&color=blue"></a>
-  <a href="https://github.com/Meluxz/iceage2-sw/releases"><img alt="downloads" src="https://img.shields.io/github/downloads/Meluxz/iceage2-sw/total?color=brightgreen"></a>
+  <a href="https://github.com/Meluxz/iceage2-sw/releases/latest"><img alt="version" src="https://img.shields.io/github/v/release/Meluxz/iceage2-sw?label=version&color=blue&cacheSeconds=3600"></a>
+  <a href="https://github.com/Meluxz/iceage2-sw/releases"><img alt="downloads" src="https://img.shields.io/github/downloads/Meluxz/iceage2-sw/total?color=brightgreen&cacheSeconds=3600"></a>
 </p>
 
 **Ice Age 2: The Meltdown** (original Xbox, NTSC-U), statically recompiled:
