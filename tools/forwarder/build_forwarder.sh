@@ -15,7 +15,7 @@ KEYS=${KEYS:?set KEYS=/path/to/prod.keys}
 TID=${TID:-01A6E2B0C0DE0000}
 NAME=${NAME:-"Ice Age 2: The Meltdown"}
 AUTHOR=${AUTHOR:-"Meluxz"}
-VERSION=${VERSION:-"0.2.1"}
+VERSION=${VERSION:-"0.3.0"}
 NRO=${NRO:-"sdmc:/switch/iceage2/iceage2.nro"}
 ICON=${ICON:-$R/assets/icon.jpg}
 F=${WORK:-$R/build/forwarder}

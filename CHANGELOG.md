@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
 - Switch: steadier 30 fps in busy scenes. The game's main thread was the
   limit: esp-relative accesses (about half of them) no longer go through the

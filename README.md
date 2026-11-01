@@ -1,12 +1,13 @@
 # Ice Age 2: The Meltdown — native Switch & Linux port
 
-[![Nintendo Switch](https://img.shields.io/badge/Nintendo%20Switch-homebrew-e60012?logo=nintendoswitch&logoColor=white)](https://github.com/Meluxz/iceage2-sw/releases)
-[![Linux](https://img.shields.io/badge/Linux-x86__64-fcc624?logo=linux&logoColor=black)](docs/BUILDING.md)
-[![Vulkan](https://img.shields.io/badge/Vulkan-1.3-ac162c?logo=vulkan&logoColor=white)](https://github.com/danfromtico/mesa-switch)
-[![OpenGL](https://img.shields.io/badge/OpenGL-renderer-5586a4?logo=opengl&logoColor=white)](docs/BUILDING.md)
-[![Release](https://img.shields.io/github/v/release/Meluxz/iceage2-sw?label=version&color=blue)](https://github.com/Meluxz/iceage2-sw/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/Meluxz/iceage2-sw/total?color=brightgreen)](https://github.com/Meluxz/iceage2-sw/releases)
-[![License](https://img.shields.io/github/license/Meluxz/iceage2-sw)](LICENSE)
+<p align="center">
+  <a href="https://github.com/Meluxz/iceage2-sw/releases"><img alt="Nintendo Switch homebrew" src="https://img.shields.io/badge/Nintendo%20Switch-homebrew-e60012?logo=nintendoswitch&logoColor=white"></a>
+  <a href="docs/BUILDING.md"><img alt="Linux x86_64" src="https://img.shields.io/badge/Linux-x86__64-fcc624?logo=linux&logoColor=black"></a>
+  <a href="https://github.com/danfromtico/mesa-switch"><img alt="Vulkan 1.3" src="https://img.shields.io/badge/Vulkan-1.3-ac162c?logo=vulkan&logoColor=white"></a>
+  <a href="docs/BUILDING.md"><img alt="OpenGL renderer" src="https://img.shields.io/badge/OpenGL-renderer-5586a4?logo=opengl&logoColor=white"></a>
+  <a href="https://github.com/Meluxz/iceage2-sw/releases/latest"><img alt="version" src="https://img.shields.io/github/v/release/Meluxz/iceage2-sw?label=version&color=blue"></a>
+  <a href="https://github.com/Meluxz/iceage2-sw/releases"><img alt="downloads" src="https://img.shields.io/github/downloads/Meluxz/iceage2-sw/total?color=brightgreen"></a>
+</p>
 
 **Ice Age 2: The Meltdown** (original Xbox, NTSC-U), statically recompiled:
 the game's x86 code is translated to C and compiled for the Switch's ARM CPU.
@@ -17,7 +18,7 @@ Built on the [xboxrecomp](https://github.com/sp00nznet/xboxrecomp) runtime as
 vendored in [burnout3-sw](https://github.com/antoxa2584x/burnout3-sw); see
 [what this port changed](docs/XBOXRECOMP_CHANGES.md).
 
-**Version 0.2.2** · Switch (Vulkan / NVK) · Linux (OpenGL) · by **Meluxz**
+**Version 0.3.0** · Switch (Vulkan / NVK) · Linux (OpenGL) · by **Meluxz**
 
 | Main menu | First level |
 |---|---|
@@ -71,6 +72,21 @@ From a [release](https://github.com/Meluxz/iceage2-sw/releases) or your own buil
 
 Log: `sdmc:/switch/iceage2/iceage2_log.txt` · options:
 `sdmc:/switch/iceage2/iceage2_env.txt` (`KEY=VALUE` per line).
+
+> [!TIP]
+> **Resolution.** The game renders at 1440×1080 docked (2.25× the Xbox's
+> 640×480) and at 640×480 handheld, and switches when you dock. You can
+> change both in `iceage2_env.txt`:
+>
+> ```
+> RECOMP_DOCK_SCALE=3        # 1920x1440, supersampled down to 1080p
+> RECOMP_HANDHELD_SCALE=1.5  # 960x720, the handheld screen's own size
+> ```
+>
+> Higher values are sharper but cost GPU time. Above the defaults, an
+> **overclocked console** (sys-clk, or an OC kernel) is recommended, or busy
+> scenes drop below 30 fps. `RECOMP_GL_SCALE=<n>` fixes one scale for both
+> modes; `RECOMP_VK_FXAA=0` turns the edge smoothing off.
 
 ## Building
 
