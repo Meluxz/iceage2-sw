@@ -1,5 +1,13 @@
 # Ice Age 2: The Meltdown — native Switch & Linux port
 
+[![Nintendo Switch](https://img.shields.io/badge/Nintendo%20Switch-homebrew-e60012?logo=nintendoswitch&logoColor=white)](https://github.com/Meluxz/iceage2-sw/releases)
+[![Linux](https://img.shields.io/badge/Linux-x86__64-fcc624?logo=linux&logoColor=black)](docs/BUILDING.md)
+[![Vulkan](https://img.shields.io/badge/Vulkan-1.3-ac162c?logo=vulkan&logoColor=white)](https://github.com/danfromtico/mesa-switch)
+[![OpenGL](https://img.shields.io/badge/OpenGL-renderer-5586a4?logo=opengl&logoColor=white)](docs/BUILDING.md)
+[![Release](https://img.shields.io/github/v/release/Meluxz/iceage2-sw?label=version&color=blue)](https://github.com/Meluxz/iceage2-sw/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/Meluxz/iceage2-sw/total?color=brightgreen)](https://github.com/Meluxz/iceage2-sw/releases)
+[![License](https://img.shields.io/github/license/Meluxz/iceage2-sw)](LICENSE)
+
 **Ice Age 2: The Meltdown** (original Xbox, NTSC-U), statically recompiled:
 the game's x86 code is translated to C and compiled for the Switch's ARM CPU.
 No emulator — the GPU, sound chip and kernel the game expects are provided by
@@ -41,6 +49,13 @@ translated:
 - **Crackling audio** → the music streamer now gets the CPU lock first
 - **20 → 30 fps on Switch** → profiled on the console: CPU culling and lock
   handovers removed from the hot path
+- **Steadier 30 fps in busy scenes** → stack accesses skip the tiled-aperture
+  check, the memory base is loaded once per function, CMP normals converted in
+  one tight loop
+- **Shader stutter** → the shader cache was written to another port's folder
+  and never loaded; it now lives in `sdmc:/switch/iceage2/`
+- **Sharper when docked** → renders at 1440×1080 docked and 640×480 handheld,
+  switching live (`RECOMP_DOCK_SCALE` / `RECOMP_HANDHELD_SCALE` to change)
 
 Details: [docs/XBOXRECOMP_CHANGES.md](docs/XBOXRECOMP_CHANGES.md) ·
 history: [CHANGELOG.md](CHANGELOG.md)

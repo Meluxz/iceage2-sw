@@ -1161,6 +1161,43 @@ static void clk_apply(void)
         s_clk_thread_up = 1;
 }
 
+#if defined(NFSU2_VULKAN)
+/* Render scale by console mode: docked (1080p out) 2.25 = 1440x1080, handheld (720p) 1.0.
+ * The renderer applies nv2a_vk_scale_pct at the next flip, so docking mid-game switches it.
+ * RECOMP_GL_SCALE set in iceage2_env.txt fixes the scale instead; RECOMP_DOCK_SCALE and
+ * RECOMP_HANDHELD_SCALE change the two values. */
+extern volatile int nv2a_vk_scale_pct;
+static AppletHookCookie s_mode_hook;
+static int s_scale_dock = 225, s_scale_hand = 100;
+
+static void mode_apply(void)
+{
+    int docked = appletGetOperationMode() == AppletOperationMode_Console;
+    nv2a_vk_scale_pct = docked ? s_scale_dock : s_scale_hand;
+    printf("[switch] %s: render scale %d%%\n", docked ? "docked" : "handheld", nv2a_vk_scale_pct);
+}
+
+static void mode_hook(AppletHookType hook, void *param)
+{
+    (void)param;
+    if (hook == AppletHookType_OnOperationMode)
+        mode_apply();
+}
+
+static void mode_scale_init(void)
+{
+    const char *e;
+    if (getenv("RECOMP_GL_SCALE"))
+        return;
+    if ((e = getenv("RECOMP_DOCK_SCALE")) && atof(e) > 0)
+        s_scale_dock = (int)(atof(e) * 100.0 + 0.5);
+    if ((e = getenv("RECOMP_HANDHELD_SCALE")) && atof(e) > 0)
+        s_scale_hand = (int)(atof(e) * 100.0 + 0.5);
+    mode_apply();
+    appletHook(&s_mode_hook, mode_hook, NULL);
+}
+#endif
+
 void switch_boot(void)
 {
     s_t0 = armGetSystemTick();
@@ -1169,6 +1206,9 @@ void switch_boot(void)
     if (s_nxlink < 0 && !log_open())
         fprintf(stderr, "[switch] log device unavailable\n");
     load_env();
+#if defined(NFSU2_VULKAN)
+    mode_scale_init();
+#endif
     s_log_sync = getenv("NFSU2_LOG_SYNC") && strcmp(getenv("NFSU2_LOG_SYNC"), "1") == 0;
     {
         const char *a = getenv("NFSU2_NO_LOG"), *b = getenv("NFSU2_LOG");

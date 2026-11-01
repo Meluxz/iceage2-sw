@@ -606,10 +606,15 @@ static int make_image(uint32_t w, uint32_t h, VkFormat fmt, VkImageUsageFlags us
 
 static VkSurf *surf_find(uint32_t va)
 {
+    static int last;                            /* draws keep hitting the same target */
     int i;
+    if (s_surf[last].image && s_surf[last].va == va)
+        return &s_surf[last];
     for (i = 0; i < VK_MAX_SURF; i++)
-        if (s_surf[i].image && s_surf[i].va == va)
+        if (s_surf[i].image && s_surf[i].va == va) {
+            last = i;
             return &s_surf[i];
+        }
     return NULL;
 }
 
@@ -1610,7 +1615,7 @@ static int s_cache_off = -1;
 static const char *cache_dir(void)
 {
 #if defined(__SWITCH__)
-    return "sdmc:/switch/b3x/";
+    return "sdmc:/switch/iceage2/";   /* next to iceage2.nro */
 #else
     return "";
 #endif
@@ -3102,11 +3107,22 @@ static int regs_changed(const uint32_t *r)
     int changed = 0;
 
     for (blk = 0; blk < 0x2000 / 64; blk++) {
+        uint64_t eight;
+        if (!(blk & 7)) {
+            /* Most of the 128 flags are clear: skip them eight at a time. */
+            memcpy(&eight, dirty + blk, 8);
+            if (!eight) {
+                blk += 7;
+                continue;
+            }
+        }
         if (!dirty[blk])
             continue;
         dirty[blk] = 0;
         if (blk >= 0xB00 / 64 && blk < 0xC00 / 64)
             continue;                           /* program / constant uploads */
+        if (!memcmp(r + blk * 16, s_regs_seen + blk * 16, 64))
+            continue;                           /* rewritten with the same values */
         for (w = blk * 16; w < blk * 16 + 16; w++) {
             uint32_t m = w * 4;
             if (r[w] == s_regs_seen[w])

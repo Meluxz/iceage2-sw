@@ -50,6 +50,11 @@ rm -f "$GEN"/*.c "$GEN"/*.h   # recomp_types.h too: it is written only when abse
   --disasm-dir "$A/disasm" --func-id-dir "$A/func_id" --abi-dir "$A/abi" \
   --exclude-manual "$MANUAL" --mmio-sections "$MMIO_SECTIONS"
 
+step stack
+# esp-relative accesses never reach the tiled aperture: MEMn(esp -> MEMn_STK(esp, which skips
+# recomp_fold_tiled (recomp_types.h).
+sed -i -E 's/\b(S?MEM)(8|16|32|64|F|D)\(esp\b/\1\2_STK(esp/g' "$GEN"/recomp_[0-9]*.c
+
 step done
 echo "total $(( (SECONDS - t0) / 60 )) min"
 ls "$GEN" | wc -l

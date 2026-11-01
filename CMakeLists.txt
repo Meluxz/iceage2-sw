@@ -142,6 +142,20 @@ else()
     endif()
     # recomp_gen_extra.h: the dr*/cr* variables the lifter leaves undeclared.
     set(ICEAGE2_GEN_FLAGS "${ICEAGE2_GEN_OPT};${ICEAGE2_GEN_DEBUG};-w;-fno-strict-aliasing;-fwrapv;-include;${CMAKE_CURRENT_SOURCE_DIR}/src/recomp_gen_extra.h")
+    # The main thread is the Switch's limit: the memory base is loaded once per function
+    # (recomp_types.h RECOMP_GEN_CONST_OFFSET), and with ICEAGE2_MEM_VOLATILE off guest RAM
+    # accesses are plain, so GCC keeps values in registers (poll loops still call out through
+    # RECOMP_SPIN_HINT, which is a compiler barrier).
+    list(APPEND ICEAGE2_GEN_FLAGS "-DRECOMP_GEN_CONST_OFFSET")
+    if(NINTENDO_SWITCH)
+        set(ICEAGE2_MEM_VOLATILE_DEFAULT OFF)
+    else()
+        set(ICEAGE2_MEM_VOLATILE_DEFAULT ON)
+    endif()
+    option(ICEAGE2_MEM_VOLATILE "Lifted guest RAM accesses are volatile" ${ICEAGE2_MEM_VOLATILE_DEFAULT})
+    if(NOT ICEAGE2_MEM_VOLATILE)
+        list(APPEND ICEAGE2_GEN_FLAGS "-DRECOMP_MEM_VOLATILE=")
+    endif()
     list(REMOVE_ITEM ICEAGE2_GEN_FLAGS "")
     set_source_files_properties(${RECOMP_GEN_SOURCES} PROPERTIES COMPILE_OPTIONS "${ICEAGE2_GEN_FLAGS}")
     if(NOT NINTENDO_SWITCH)

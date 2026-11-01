@@ -99,8 +99,16 @@ void recomp_debug_service(uint32_t service, uint32_t arg_va);
  * When mapped elsewhere, this adjusts all memory accesses.
  *
  * Set once during memory initialization, then read-only.
+ *
+ * RECOMP_GEN_CONST_OFFSET (the lifted code only): declared const there, so a
+ * guest store cannot alias it and it is loaded once per function instead of
+ * after every store. The runtime sets it before any lifted code runs.
  */
+#if defined(RECOMP_GEN_CONST_OFFSET)
+extern const ptrdiff_t g_xbox_mem_offset;
+#else
 extern ptrdiff_t g_xbox_mem_offset;
+#endif
 
 /* Bounds of the title's executable sections, filled in by
  * xbox_MemoryLayoutInit from the XBE's own section table. Zero means "not
@@ -542,6 +550,21 @@ static inline uint32_t recomp_fold_tiled(uint32_t a)
 #define MEMF(addr)   (*(RECOMP_MEM_VOLATILE float    *)XBOX_PTR(addr))
 #define MEMD(addr)   (*(RECOMP_MEM_VOLATILE double   *)XBOX_PTR(addr))
 
+/* Stack accesses (PUSH32/POP32, and MEMn(esp ...) which tools/regen.sh
+ * rewrites to MEMn_STK): the guest stack is never in the tiled aperture, so
+ * they skip recomp_fold_tiled -- about half of all accesses, five ALU ops each. */
+#define XBOX_STK_PTR(addr) ((uintptr_t)(uint32_t)(addr) + g_xbox_mem_offset)
+#define MEM8_STK(addr)   (*(RECOMP_MEM_VOLATILE uint8_t  *)XBOX_STK_PTR(addr))
+#define MEM16_STK(addr)  (*(RECOMP_MEM_VOLATILE uint16_t *)XBOX_STK_PTR(addr))
+#define MEM32_STK(addr)  (*(RECOMP_MEM_VOLATILE uint32_t *)XBOX_STK_PTR(addr))
+#define MEM64_STK(addr)  (*(RECOMP_MEM_VOLATILE uint64_t *)XBOX_STK_PTR(addr))
+#define SMEM8_STK(addr)  (*(RECOMP_MEM_VOLATILE int8_t   *)XBOX_STK_PTR(addr))
+#define SMEM16_STK(addr) (*(RECOMP_MEM_VOLATILE int16_t  *)XBOX_STK_PTR(addr))
+#define SMEM32_STK(addr) (*(RECOMP_MEM_VOLATILE int32_t  *)XBOX_STK_PTR(addr))
+#define SMEM64_STK(addr) (*(RECOMP_MEM_VOLATILE int64_t  *)XBOX_STK_PTR(addr))
+#define MEMF_STK(addr)   (*(RECOMP_MEM_VOLATILE float    *)XBOX_STK_PTR(addr))
+#define MEMD_STK(addr)   (*(RECOMP_MEM_VOLATILE double   *)XBOX_STK_PTR(addr))
+
 /* Device-aware accesses, emitted only for functions in the sections given to
  * tools.recomp --mmio-sections (the XDK's DSOUND, say). Addresses at or above
  * 0xFD000000 -- the NV2A, MCPX and flash apertures -- go to the runtime,
@@ -960,7 +983,7 @@ static inline uint16_t ROR16(uint16_t val, int n) {
 #define PUSH32(sp, val) do { \
     uint32_t _pv = (uint32_t)(val); \
     (sp) -= 4; \
-    MEM32(sp) = _pv; \
+    MEM32_STK(sp) = _pv; \
 } while(0)
 
 /**
@@ -978,7 +1001,7 @@ static inline int recomp_parity8(uint32_t x) {
 
 /** Pop a 32-bit value from the simulated stack. */
 #define POP32(sp, dst) do { \
-    (dst) = MEM32(sp); \
+    (dst) = MEM32_STK(sp); \
     (sp) += 4; \
 } while(0)
 

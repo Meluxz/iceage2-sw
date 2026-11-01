@@ -3332,6 +3332,23 @@ static void raw_batch(void)
         for (a = 0; conv && a < NV2A_RAW_ATTRS; a++) {
             if (!(conv & (1u << a)))
                 continue;
+            if (s_gpu.attr[a].type == 6 && !s_gpu.inline_active && s_gpu.attr[a].offset) {
+                /* CMP normals, fetch_attr's case 6 in one tight loop: they are
+                 * most of what is left to convert (~6% of the executor). */
+                const VertexAttr *va = &s_gpu.attr[a];
+                const uint8_t *p = (const uint8_t *)xbox_GetMemoryOffset() + va->offset
+                                 + (size_t)lo * va->stride;
+                float *o = s_raw_attrs + (size_t)a * 4;
+                for (i = 0; i < nv; i++, p += va->stride, o += NV2A_RAW_ATTRS * 4) {
+                    int32_t v;
+                    memcpy(&v, p, 4);
+                    o[0] = (float)((int32_t)((uint32_t)v << 21) >> 21) * (1.0f / 1023.0f);
+                    o[1] = (float)((int32_t)((uint32_t)v << 10) >> 21) * (1.0f / 1023.0f);
+                    o[2] = (float)(v >> 22) * (1.0f / 511.0f);
+                    o[3] = 1.0f;
+                }
+                continue;
+            }
             for (i = 0; i < nv; i++)
                 fetch_attr(&s_gpu.attr[a], lo + i,
                            s_raw_attrs + ((size_t)i * NV2A_RAW_ATTRS + a) * 4);
