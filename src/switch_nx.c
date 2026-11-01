@@ -1184,6 +1184,24 @@ static void mode_hook(AppletHookType hook, void *param)
         mode_apply();
 }
 
+/* Nothing else reads applet messages on the Switch (SDL's event pump runs only on Linux), so
+ * the operation mode libnx caches never changed and the hooks never ran. Twice a second,
+ * this thread hands the queued messages to libnx, which updates the mode and calls the
+ * hooks (this one and the clock keeper's). */
+static Thread s_msg_thread;
+
+static void msg_pump(void *arg)
+{
+    (void)arg;
+    for (;;) {
+        u32 msg;
+        while (R_SUCCEEDED(appletGetMessage(&msg)))
+            if (!appletProcessMessage(msg))
+                return;                         /* exit requested: stop reading */
+        svcSleepThread(500000000ll);
+    }
+}
+
 static void mode_scale_init(void)
 {
     const char *e;
@@ -1195,6 +1213,9 @@ static void mode_scale_init(void)
         s_scale_hand = (int)(atof(e) * 100.0 + 0.5);
     mode_apply();
     appletHook(&s_mode_hook, mode_hook, NULL);
+    if (R_FAILED(threadCreate(&s_msg_thread, msg_pump, NULL, NULL, 0x4000, 0x2C, -2))
+        || R_FAILED(threadStart(&s_msg_thread)))
+        printf("[switch] no applet message thread: render scale stays %d%%\n", nv2a_vk_scale_pct);
 }
 #endif
 

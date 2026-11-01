@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1
+
+- Switch: docking or undocking mid-game now switches the render scale.
+  Nothing read applet messages on the Switch (SDL's event pump runs only on
+  Linux), so the cached operation mode never changed; a small thread now
+  hands them to libnx twice a second
+
 ## 0.3.0
 
 - Switch: steadier 30 fps in busy scenes. The game's main thread was the
