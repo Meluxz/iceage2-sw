@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.2
+
+- Saves: all three slots work. The Switch reported exactly 8 GB free (524288
+  clusters), which the game's 32-bit byte count read as 0, so a new slot
+  failed with "not enough free blocks"; free space is now kept under 4 GB
+- Pressing B on the save slot screen no longer closes the game: it asks for
+  the Xbox Dashboard to free blocks (XapiBootToDash), and the Switch build now
+  restarts the game instead (envSetNextLoad)
+
 ## 0.3.1
 
 - Switch: docking or undocking mid-game now switches the render scale.

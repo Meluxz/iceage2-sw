@@ -1716,6 +1716,17 @@ static void bridge_HalReturnToFirmware(void)
             for (i = 0; i < 8; i++)
                 fprintf(stderr, " %08X", BRIDGE_MEM32(page + 1024 + i * 4));
             fprintf(stderr, "\n");
+#if defined(__SWITCH__)
+            /* Type 1 with no path is XapiBootToDash: the title sends the player
+             * to the Dashboard (Ice Age 2: B on the save slot screen, "free
+             * blocks"). There is none here, so the host starts the title again
+             * instead of just closing it. */
+            if (BRIDGE_MEM32(page) == 1 && !path[0]) {
+                extern void recomp_on_boot_to_dash(void) __attribute__((weak));
+                if (recomp_on_boot_to_dash)
+                    recomp_on_boot_to_dash();
+            }
+#endif
         } else {
             fprintf(stderr, "  [KERNEL] no launch data page set\n");
         }

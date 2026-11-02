@@ -1188,9 +1188,17 @@ NTSTATUS __stdcall xbox_NtQueryVolumeInformationFile(
                 info->TotalAllocationUnits.QuadPart = total / cs;
                 info->AvailableAllocationUnits.QuadPart = avail / cs;
             } else {
-                info->TotalAllocationUnits.QuadPart = 1048576;
-                info->AvailableAllocationUnits.QuadPart = 524288;
+                info->TotalAllocationUnits.QuadPart = 300000;
+                info->AvailableAllocationUnits.QuadPart = 200000;
             }
+            /* A retail Xbox's partitions hold under 4 GB free, and titles count
+             * the bytes in 32 bits: the old 524288 clusters (exactly 8 GB) read
+             * as 0 free, and Ice Age 2 refused to save to a new slot and sent the
+             * player to the Dashboard to free blocks. Keep both under 4 GB. */
+            if (info->AvailableAllocationUnits.QuadPart > 200000)
+                info->AvailableAllocationUnits.QuadPart = 200000;
+            if (info->TotalAllocationUnits.QuadPart > 300000)
+                info->TotalAllocationUnits.QuadPart = 300000;
             IoStatusBlock->Status = STATUS_SUCCESS;
             IoStatusBlock->Information = sizeof(XBOX_FILE_FS_SIZE_INFORMATION);
             return STATUS_SUCCESS;

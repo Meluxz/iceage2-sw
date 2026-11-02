@@ -1219,6 +1219,28 @@ static void mode_scale_init(void)
 }
 #endif
 
+/* The title asked for the Xbox Dashboard (kernel_bridge.c, HalReturnToFirmware): have the
+ * homebrew loader start this NRO again when the process exits, so the player lands back on
+ * the title screen instead of in hbmenu. */
+extern char **__system_argv;
+extern int __system_argc;
+
+void recomp_on_boot_to_dash(void)
+{
+    const char *nro = "sdmc:/switch/iceage2/iceage2.nro";
+    static char argv[512];
+    if (__system_argc > 0 && __system_argv && __system_argv[0]
+        && !strncmp(__system_argv[0], "sdmc:/", 6))
+        nro = __system_argv[0];
+    if (!envHasNextLoad()) {
+        printf("[switch] Dashboard asked for: the loader cannot restart %s, exiting\n", nro);
+        return;
+    }
+    snprintf(argv, sizeof argv, "%s", nro);
+    printf("[switch] Dashboard asked for (no Dashboard here): restarting %s\n", nro);
+    envSetNextLoad(nro, argv);
+}
+
 void switch_boot(void)
 {
     s_t0 = armGetSystemTick();

@@ -18,7 +18,7 @@ Built on the [xboxrecomp](https://github.com/sp00nznet/xboxrecomp) runtime as
 vendored in [burnout3-sw](https://github.com/antoxa2584x/burnout3-sw); see
 [what this port changed](docs/XBOXRECOMP_CHANGES.md).
 
-**Version 0.3.1** · Switch (Vulkan / NVK) · Linux (OpenGL) · by **Meluxz**
+**Version 0.3.2** · Switch (Vulkan / NVK) · Linux (OpenGL) · by **Meluxz**
 
 | Main menu | First level |
 |---|---|
@@ -69,6 +69,11 @@ From a [release](https://github.com/Meluxz/iceage2-sw/releases) or your own buil
 2. Your extracted disc (`default.xbe`, `IceAge2/`, ...) → `sdmc:/switch/iceage2/game/`
 3. Launch with **title takeover** (hold **R** on any game) — applet mode has
    too little memory
+
+> [!NOTE]
+> **Saving.** The game does not save on its own: open the menu and choose
+> **Save** to write your progress to a slot. Saves are kept in
+> `sdmc:/switch/iceage2/game/UDATA`.
 
 Log: `sdmc:/switch/iceage2/iceage2_log.txt` · options:
 `sdmc:/switch/iceage2/iceage2_env.txt` (`KEY=VALUE` per line).
